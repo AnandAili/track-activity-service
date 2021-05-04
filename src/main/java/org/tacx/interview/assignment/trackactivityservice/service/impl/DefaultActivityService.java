@@ -34,7 +34,9 @@ public class DefaultActivityService implements ActivityService {
 	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRES_NEW)
 	public Optional<Activity> getActivityById(Integer activityId) {
-		return activityRepository.findById(activityId);
+		Optional<Activity> activity = activityRepository.findById(activityId);
+		log.info("Activity {} is found");
+		return activity;
 	}
 
 	/**
@@ -50,7 +52,7 @@ public class DefaultActivityService implements ActivityService {
 		deletedActivity.ifPresent(activity -> {
 			activityRepository.delete(activity);
 		});
-		// TODO: it's Idempotent operation, print it in logger
+		log.info("Activity {} is deleted successfully", activityId);
 		return deletedActivity;
 	}
 
@@ -60,15 +62,26 @@ public class DefaultActivityService implements ActivityService {
 	 * @return
 	 */
 	@Override
+	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public Optional<Activity> createActivity(Activity newActivity) {
 		// TODO: check file duplicate
-		var activity = activityRepository.findActivityByNameAndType(newActivity.getName(),
-				newActivity.getType());
-		activity.ifPresent(a -> {
-			// TODO: pass name and type
-			throw new ActivityAlreadyExistsException(activity.get().getActivityId());
-		});
-		return Optional.of(activityRepository.save(newActivity));
+		var activity = activityRepository.findActivityByNameAndTypeAndStartTime(
+				newActivity.getName(), newActivity.getType(), newActivity.getStartTime());
+		boolean isActivityFound = activity.isPresent();
+		if (activity.isPresent()) {
+			// Delete all records and insert new once
+			log.info("Activity {} is already exist", activity.get().getActivityId());
+			activityRepository.delete(activity.get());
+			newActivity = activityRepository.save(newActivity);
+			log.info("Inserted new records to activity {} successfully",
+					newActivity.getActivityId());
+		}
+		else {
+			newActivity = activityRepository.save(newActivity);
+			log.info("Created a new Activity {} successfully",
+					newActivity.getActivityId());
+		}
+		return Optional.of(newActivity);
 	}
 
 	// TODO: write test case for it
@@ -77,6 +90,7 @@ public class DefaultActivityService implements ActivityService {
 	 * @return
 	 */
 	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRES_NEW)
 	public List<Activity> getAllActivities() {
 		return activityRepository.findAll();
 	}

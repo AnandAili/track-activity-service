@@ -51,6 +51,24 @@ class DefaultActivityServiceIntegrationTest {
 	}
 
 	@Test
+	void givenActivityOne_thencreateActivityOne_thenInsertNewRecords() {
+		// Given:
+		Optional<Activity> expectedActivity = activityService.createActivity(
+				TestActivities.createActivityWithRecords("Morning Ride", "Cycling", 2));
+
+		// When:
+		Activity newActivity = TestActivities.createActivityWithRecords("Morning Ride",
+				"Cycling", 3);
+		newActivity.setStartTime(expectedActivity.get().getStartTime());
+		Optional<Activity> actualActivity = activityService.createActivity(newActivity);
+
+		// Then:
+		assertThat(expectedActivity.get().getRecords().size())
+				.isNotEqualTo(newActivity.getRecords().size());
+
+	}
+
+	@Test
 	void getActivityById() {
 		// Given:
 		Optional<Activity> expectedActivity1 = activityService
@@ -95,18 +113,21 @@ class DefaultActivityServiceIntegrationTest {
 		assertThat(activityService.getAllActivities().size()).isEqualTo(1);
 	}
 
-	@Test
-	void givenActivityOne_thencreateActivityOne_thenThrowException() {
-		// Given:
-		Optional<Activity> expectedActivity = activityService
-				.createActivity(TestActivities.createActivity("Morning Ride", "Cycling"));
-
-		// When and Then
-		Activity newActivity = TestActivities.createActivity("Morning Ride", "Cycling");
-		assertThrows(ActivityAlreadyExistsException.class, () -> {
-			activityService.createActivity(newActivity);
-		});
-
-	}
+	/*
+	 * allowing new records to upload
+	 */
+	/*
+	 * @Test void givenActivityOne_thencreateActivityOne_thenThrowException() { // Given:
+	 * Optional<Activity> expectedActivity = activityService
+	 * .createActivity(TestActivities.createActivity("Morning Ride", "Cycling"));
+	 *
+	 * // When and Then Activity newActivity =
+	 * TestActivities.createActivity("Morning Ride", "Cycling");
+	 * newActivity.setStartTime(expectedActivity.get().getStartTime());
+	 * assertThrows(ActivityAlreadyExistsException.class, () -> {
+	 * activityService.createActivity(newActivity); });
+	 *
+	 * }
+	 */
 
 }

@@ -13,7 +13,7 @@ import org.tacx.interview.assignment.trackactivityservice.exception.file.Multipl
 import org.tacx.interview.assignment.trackactivityservice.exception.file.WrongFileExtensionException;
 import org.tacx.interview.assignment.trackactivityservice.exception.storage.StorageException;
 import org.tacx.interview.assignment.trackactivityservice.fileprocessor.CSVToEntityProcessor;
-import org.tacx.interview.assignment.trackactivityservice.fileprocessor.Files;
+import org.tacx.interview.assignment.trackactivityservice.fileprocessor.ActivityFiles;
 import org.tacx.interview.assignment.trackactivityservice.service.ActivityService;
 import org.tacx.interview.assignment.trackactivityservice.storage.impl.FileSystemStorageService;
 import org.tacx.interview.assignment.trackactivityservice.storage.StorageService;
@@ -57,12 +57,13 @@ public class ActivityController {
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public void createActivity(@RequestParam("file") MultipartFile file)
 			throws Exception {
+		log.info("Received POST request to create a activity");
 		// Basic validation for file like size, extension, etc
-		Files.validate(file);
+		ActivityFiles.validate(file);
 		Activity activity = csvToEntityProcessor.getActivityFromCSV(file);
 		activityService.createActivity(activity);
-		storageService.store(file);
-
+		storageService.store(file, activity);
+		log.info("Activity is created successfullyy");
 	}
 
 	/**
@@ -73,9 +74,13 @@ public class ActivityController {
 	 */
 	@GetMapping(value = "/{activityId}", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ActivityResponse getActivity(@PathVariable("activityId") Integer activityId) {
+		log.info("Received GET request for activity: {}", activityId);
+		ActivityResponse activityResponse = null;
 		Activity activity = activityService.getActivityById(activityId).orElseThrow(
 				() -> new ActivityNotFoundException(String.valueOf(activityId)));
-		return ActivityResponse.creteActivityResponse(activity);
+		activityResponse = ActivityResponse.creteActivityResponse(activity);
+		log.info("Activity {} is found", activityId);
+		return activityResponse;
 	}
 
 	/**
@@ -84,10 +89,14 @@ public class ActivityController {
 	 */
 	@GetMapping(value = "/")
 	public List<ActivityResponse> getAllActivities() {
+		log.info("Received GET request to fetch all  activities");
+		List<ActivityResponse> activityResponseList = null;
 		List<Activity> activities = activityService.getAllActivities();
-		return activities.stream().map(activity -> {
+		activityResponseList = activities.stream().map(activity -> {
 			return ActivityResponse.creteActivityResponse(activity);
 		}).collect(Collectors.toList());
+		log.info("Request to fetch all activities executed successfully");
+		return activityResponseList;
 	}
 
 	/**
@@ -98,12 +107,15 @@ public class ActivityController {
 	@DeleteMapping(value = "/{activityId}")
 	public ActivityResponse deleteActivity(
 			@PathVariable("activityId") Integer activityId) {
+		log.info("Received DELETE request to delete activity {}", activityId);
 		ActivityResponse response = null;
 		// TODO: checkwhether or not activity is exist
 		Optional<Activity> deletedActivity = activityService.deleteActivity(activityId);
 		if (deletedActivity.isPresent()) {
 			response = ActivityResponse.creteActivityResponse(deletedActivity.get());
 		}
+		log.info("Activity {} is deleted successfully",
+				deletedActivity.get().getActivityId());
 		return response;
 	}
 

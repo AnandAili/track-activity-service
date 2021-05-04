@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.tacx.interview.assignment.trackactivityservice.entity.Activity;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -19,6 +20,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Integer> {
 	 * @param type
 	 * @return
 	 */
-	Optional<Activity> findActivityByNameAndType(String name, String type);
+	Optional<Activity> findActivityByNameAndTypeAndStartTime(String name, String type,
+			LocalDateTime startTime);
 
 }

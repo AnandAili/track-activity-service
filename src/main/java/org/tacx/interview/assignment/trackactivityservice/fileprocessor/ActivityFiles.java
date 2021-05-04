@@ -2,6 +2,7 @@ package org.tacx.interview.assignment.trackactivityservice.fileprocessor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
+import org.tacx.interview.assignment.trackactivityservice.entity.Activity;
 import org.tacx.interview.assignment.trackactivityservice.exception.file.EmptyFileException;
 import org.tacx.interview.assignment.trackactivityservice.exception.file.MultipleFileExtensionException;
 import org.tacx.interview.assignment.trackactivityservice.exception.file.WrongFileExtensionException;
@@ -14,7 +15,15 @@ import java.util.Date;
  * Utility Class for Basic validations for uploaded file
  */
 @Slf4j
-public class Files {
+public class ActivityFiles {
+
+	public static final String SPACE = " ";
+
+	public static final String BLANK = "";
+
+	public static final String HYPHEN = "-";
+
+	public static final String CSV = ".csv";
 
 	public static void validate(MultipartFile file) {
 		isEmptyFile(file);
@@ -47,6 +56,15 @@ public class Files {
 		LocalDateTime datetime = LocalDateTime.parse(new Date().toInstant().toString(),
 				oldPattern);
 		return datetime.format(newPattern);
+	}
+
+	public static String getNewFileName(MultipartFile file, Activity activity) {
+		String originalFilenae = file.getOriginalFilename().split("\\.")[0];
+		StringBuilder newFilename = new StringBuilder(originalFilenae);
+		newFilename.append(HYPHEN).append(activity.getName().replace(SPACE, BLANK))
+				.append(HYPHEN).append(activity.getType().replace(SPACE, BLANK))
+				.append(HYPHEN).append(getDateAsString()).append(CSV);
+		return newFilename.toString();
 	}
 
 }

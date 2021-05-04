@@ -6,6 +6,8 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.tacx.interview.assignment.trackactivityservice.TestActivities;
+import org.tacx.interview.assignment.trackactivityservice.entity.Activity;
 import org.tacx.interview.assignment.trackactivityservice.storage.impl.FileSystemStorageService;
 
 import java.nio.file.Files;
@@ -34,10 +36,13 @@ class FileSystemStorageServiceTest {
 	@EnabledOnOs({ OS.LINUX })
 	public void saveAbsolutePathInFilenamePermitted() {
 		// Unix file systems (e.g. ext4) allows backslash '\' in file names.
+		Activity dummyActivity = TestActivities.createActivityWithRecords("Morning Ride",
+				"Cycling", 2);
 		String fileName = "test.csv";
 		service.store(
 				new MockMultipartFile(fileName, fileName, MediaType.TEXT_PLAIN_VALUE,
-						"activty_def,name,type,start_time,".getBytes()));
+						"activty_def,name,type,start_time,".getBytes()),
+				dummyActivity);
 		assertTrue(Files.exists(
 				Paths.get(properties.getLocation()).resolve(Paths.get(fileName))));
 	}

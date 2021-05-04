@@ -10,6 +10,7 @@ import org.tacx.interview.assignment.trackactivityservice.exception.activity.Act
 import org.tacx.interview.assignment.trackactivityservice.repository.ActivityRepository;
 import org.tacx.interview.assignment.trackactivityservice.service.ActivityService;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,35 +84,61 @@ class DefaultActivityServiceUnitTest {
 		// Given:
 		Activity expectedActivity = TestActivities.createActivity("Evening Ride",
 				"Cycling");
-		given(activityRepository.findActivityByNameAndType(anyString(), anyString()))
-				.willReturn(Optional.empty());
+		given(activityRepository.findActivityByNameAndTypeAndStartTime(anyString(),
+				anyString(), any(LocalDateTime.class))).willReturn(Optional.empty());
 		given(activityRepository.save(any(Activity.class))).willReturn(expectedActivity);
 		// When:
 		Optional<Activity> createdActivity = activityService
 				.createActivity(expectedActivity);
 		// Then:
 		assertThat(createdActivity.get()).isEqualTo(expectedActivity);
-		verify(activityRepository, times(1)).findActivityByNameAndType("Evening Ride",
-				"Cycling");
+		verify(activityRepository, times(1)).findActivityByNameAndTypeAndStartTime(
+				"Evening Ride", "Cycling", createdActivity.get().getStartTime());
 		verify(activityRepository, times(1)).save(expectedActivity);
 	}
 
 	@Test
-	void givenActivityOne_whenTryToCreateActivityOne_thenThrowActivityAlreadyExistException() {
+	void givenActivityOne_whenTryToCreateActivityOne_thenInsertOnlynewRecords() {
 
 		// Given:
 		Activity expectedActivity = TestActivities.createActivity("Evening Ride",
 				"Cycling");
-		given(activityRepository.findActivityByNameAndType(anyString(), anyString()))
-				.willReturn(Optional.of(expectedActivity));
+		given(activityRepository.findActivityByNameAndTypeAndStartTime(anyString(),
+				anyString(), any(LocalDateTime.class)))
+						.willReturn(Optional.of(expectedActivity));
+		given(activityRepository.save(any(Activity.class))).willReturn(expectedActivity);
+		willDoNothing().given(activityRepository).delete(expectedActivity);
 		// When:
-		assertThrows(ActivityAlreadyExistsException.class, () -> {
-			activityService.createActivity(expectedActivity);
-		});
+		Optional<Activity> createdActivity = activityService
+				.createActivity(expectedActivity);
 		// Then:
-		verify(activityRepository, times(1)).findActivityByNameAndType("Evening Ride",
-				"Cycling");
+		assertThat(createdActivity.get()).isEqualTo(expectedActivity);
+		verify(activityRepository, times(1)).findActivityByNameAndTypeAndStartTime(
+				"Evening Ride", "Cycling", createdActivity.get().getStartTime());
+		verify(activityRepository, times(1)).save(expectedActivity);
+		verify(activityRepository, times(1)).delete(expectedActivity);
 
 	}
+
+	/**
+	 * commented this test case, because now allowing to insert new records for exisitng
+	 * activity
+	 */
+	/*
+	 * @Test void
+	 * givenActivityOne_whenTryToCreateActivityOne_thenThrowActivityAlreadyExistException(
+	 * ) {
+	 *
+	 * // Given: Activity expectedActivity = TestActivities.createActivity("Evening Ride",
+	 * "Cycling");
+	 * given(activityRepository.findActivityByNameAndTypeAndStartTime(anyString(),
+	 * anyString(), any(LocalDateTime.class))) .willReturn(Optional.of(expectedActivity));
+	 * // When: assertThrows(ActivityAlreadyExistsException.class, () -> {
+	 * activityService.createActivity(expectedActivity); }); // Then:
+	 * verify(activityRepository, times(1)).findActivityByNameAndTypeAndStartTime(
+	 * "Evening Ride", "Cycling", expectedActivity.getStartTime());
+	 *
+	 * }
+	 */
 
 }

@@ -51,10 +51,13 @@ class ActivityControllerUnitTest {
 	@Test
 	void createActivity() throws Exception {
 		// Given:
+		Activity expectedActivity = TestActivities
+				.createActivityWithRecords("Morning Ride", "Cycling", 2);
 		given(csvToEntityProcessor.getActivityFromCSV(any(MultipartFile.class)))
 				.willReturn(TestActivities.createActivityWithRecords("Morning Ride",
 						"Cycling", 2));
-		willDoNothing().given(storageService).store(any(MultipartFile.class));
+		willDoNothing().given(storageService).store(any(MultipartFile.class),
+				any(Activity.class));
 
 		// When:
 		MockMultipartFile multipartFile = new MockMultipartFile("file", "test.csv",
@@ -63,7 +66,7 @@ class ActivityControllerUnitTest {
 				.andExpect(status().isCreated());
 		// Then:
 		verify(csvToEntityProcessor, times(1)).getActivityFromCSV(multipartFile);
-		verify(storageService, times(1)).store(multipartFile);
+		verify(storageService, times(1)).store(multipartFile, expectedActivity);
 
 	}
 

@@ -1,6 +1,5 @@
 package org.tacx.interview.assignment.trackactivityservice.repository;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -8,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.tacx.interview.assignment.trackactivityservice.entity.Activity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,7 +105,8 @@ class ActivityRepositoryIntegrationTest {
 				.persist(createActivityWithRecords("Evening Ride", "Cycling", 2));
 		// When: delete the activity
 		Optional<Activity> actualActivity = activityRepository
-				.findActivityByNameAndType("Evening Ride", "Cycling");
+				.findActivityByNameAndTypeAndStartTime("Evening Ride", "Cycling",
+						expectedEveiningRide.getStartTime());
 		// Then: return null from repository
 		assertThat(actualActivity.get().getName()).isEqualTo("Evening Ride");
 		assertThat(actualActivity.get().getType()).isEqualTo("Cycling");
