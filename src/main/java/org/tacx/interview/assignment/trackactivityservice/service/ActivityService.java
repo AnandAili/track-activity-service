@@ -11,14 +11,14 @@ import java.util.Optional;
 public interface ActivityService {
 
 	/**
-	 * Get a Activity by It's id
+	 * Get an Activity by It's id
 	 * @param activityId
 	 * @return
 	 */
 	Optional<Activity> getActivityById(Integer activityId);
 
 	/**
-	 * Delete a Activity by It's id.
+	 * Delete an Activity by It's id.
 	 * @param activityId
 	 * @return
 	 */

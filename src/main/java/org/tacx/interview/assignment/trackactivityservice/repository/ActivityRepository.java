@@ -8,14 +8,14 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * Activity JPA Repository to manage life-cycle of a activity & It's records in the
+ * Activity JPA Repository to manage life-cycle of an activity & It's records in the
  * database.
  */
 @Repository
 public interface ActivityRepository extends JpaRepository<Activity, Integer> {
 
 	/**
-	 * Fetch a activity by name & type
+	 * Fetch an activity by name & type
 	 * @param name
 	 * @param type
 	 * @return

@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
- * Activity JPA entity represents a activity data in the database.
+ * Activity JPA entity represents an activity data in the database.
  */
 @Slf4j
 @Entity

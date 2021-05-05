@@ -56,6 +56,8 @@ class ActivityControllerUnitTest {
 		given(csvToEntityProcessor.getActivityFromCSV(any(MultipartFile.class)))
 				.willReturn(TestActivities.createActivityWithRecords("Morning Ride",
 						"Cycling", 2));
+		given(activityService.createActivity(any(Activity.class)))
+				.willReturn(Optional.of(expectedActivity));
 		willDoNothing().given(storageService).store(any(MultipartFile.class),
 				any(Activity.class));
 
@@ -63,10 +65,11 @@ class ActivityControllerUnitTest {
 		MockMultipartFile multipartFile = new MockMultipartFile("file", "test.csv",
 				"text/plain", "activty_def,name,type,start_time,".getBytes());
 		mockMvc.perform(multipart("/activities/").file(multipartFile))
-				.andExpect(status().isCreated());
+				.andExpect(status().isOk());
 		// Then:
 		verify(csvToEntityProcessor, times(1)).getActivityFromCSV(multipartFile);
 		verify(storageService, times(1)).store(multipartFile, expectedActivity);
+		verify(activityService, times(1)).createActivity(expectedActivity);
 
 	}
 

@@ -27,7 +27,7 @@ public class DefaultActivityService implements ActivityService {
 	}
 
 	/**
-	 * Get a Activity by It's id
+	 * Get an Activity by It's id
 	 * @param activityId
 	 * @return
 	 */
@@ -40,7 +40,7 @@ public class DefaultActivityService implements ActivityService {
 	}
 
 	/**
-	 * Delete a Activity by It's id.
+	 * Delete an Activity by It's id.
 	 * @param activityId
 	 * @return
 	 */

@@ -41,7 +41,7 @@ class ActivityRepositoryIntegrationTest {
 				.persist(createActivityWithRecords("Eveining Ride", "Cycling", 2));
 		entityManager.persist(createActivityWithRecords("Morning Ride", "Cycling", 4));
 
-		// When: fetch a activity details by it's id
+		// When: fetch an activity details by it's id
 		Optional<Activity> actualActivity = activityRepository
 				.findById(expectedEveiningRide.getActivityId());
 
@@ -55,7 +55,7 @@ class ActivityRepositoryIntegrationTest {
 	public void testCreateActivityWithRecords_ShouldReturnSuccess() {
 		// Given: no activites
 
-		// When: create a activity
+		// When: create an activity
 		Activity morningRide = activityRepository
 				.save(createActivityWithRecords("Morning Ride", "Cycling", 2));
 
@@ -87,7 +87,7 @@ class ActivityRepositoryIntegrationTest {
 
 	@Test
 	public void testDeleteActivity_ShouldDeletedFromDatabase() {
-		// Given: a activity
+		// Given: an activity
 		Activity expectedEveiningRide = entityManager
 				.persist(createActivityWithRecords("Eveining Ride", "Cycling", 2));
 		// When: delete the activity
@@ -100,7 +100,7 @@ class ActivityRepositoryIntegrationTest {
 
 	@Test
 	void testGetActivityByNameType_ShouldReturnActivity() {
-		// Given: a activity
+		// Given: an activity
 		Activity expectedEveiningRide = entityManager
 				.persist(createActivityWithRecords("Evening Ride", "Cycling", 2));
 		// When: delete the activity

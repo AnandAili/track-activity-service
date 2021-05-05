@@ -54,20 +54,21 @@ public class ActivityController {
 	 * uploaded file is not a csv format.
 	 */
 	@PostMapping(value = "/", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-	@ResponseStatus(code = HttpStatus.CREATED)
-	public void createActivity(@RequestParam("file") MultipartFile file)
+	@ResponseStatus(code = HttpStatus.OK)
+	public String createActivity(@RequestParam("file") MultipartFile file)
 			throws Exception {
-		log.info("Received POST request to create a activity");
+		log.info("Received POST request to create an activity");
 		// Basic validation for file like size, extension, etc
 		ActivityFiles.validate(file);
 		Activity activity = csvToEntityProcessor.getActivityFromCSV(file);
-		activityService.createActivity(activity);
+		activity = activityService.createActivity(activity).get();
 		storageService.store(file, activity);
 		log.info("Activity is created successfullyy");
+		return "Activity " + activity.getActivityId() + " is created";
 	}
 
 	/**
-	 * Get API to fetch a Activity summary details.
+	 * Get API to fetch an Activity summary details.
 	 * @param activityId
 	 * @return
 	 * @throws {@link ActivityNotFoundException} - If the activityId is not found
@@ -100,7 +101,7 @@ public class ActivityController {
 	}
 
 	/**
-	 * Delete API to remove a Activity.
+	 * Delete API to remove an Activity.
 	 * @param activityId
 	 * @return
 	 */

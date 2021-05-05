@@ -47,7 +47,7 @@ class ActivityControllerIntegrationTest {
 		var requestEntity = new HttpEntity<>(map, headers);
 		ResponseEntity<String> response = this.restTemplate.postForEntity(
 				"http://localhost:" + port + "/activities/", requestEntity, String.class);
-		assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
+		assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
 
 	}
 
